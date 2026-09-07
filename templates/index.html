@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Habit Tracker</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- TOAST -->
+<div id="toast-area"></div>
+
+<!-- DELETE MODAL -->
+<div id="del-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🗑️</div>
+    <div class="modal-title">Delete Karen?</div>
+    <div class="modal-desc" id="modal-desc">Permanently delete hoga.</div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-delete" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMAGE VIEWER -->
+<div id="img-viewer">
+  <button id="img-viewer-close" onclick="closeImgViewer()">✕</button>
+  <img id="img-viewer-img" src="" alt="">
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="app-title">✦ Habit Tracker</div>
+  <div class="sgrid">
+    <div class="sbox"><span class="snum" id="s-total" style="color:#a78bfa">0</span><span class="slbl">Total Habits</span></div>
+    <div class="sbox"><span class="snum" id="s-done" style="color:#34d399">0</span><span class="slbl">Completions</span></div>
+    <div class="sbox"><span class="snum" id="s-rate" style="color:#fbbf24">0%</span><span class="slbl">Rate</span></div>
+    <div class="sbox"><span class="snum" id="s-streak" style="color:#f472b6">0🔥</span><span class="slbl">Streak</span></div>
+  </div>
+</div>
+<div id="savebar" class="savebar">✓ Saved!</div>
+
+<!-- ══ SCREEN 1: HABITS ══ -->
+<div class="screen active" id="screen-habits">
+
+  <div class="mnav">
+    <button class="mnav-btn" onclick="prevMonth()">‹</button>
+    <div class="mnav-lbl" id="month-label"></div>
+    <button class="mnav-btn" onclick="nextMonth()">›</button>
+  </div>
+
+  <!-- ADD HABIT -->
+  <div class="add-box">
+    <input type="text" id="habit-input" placeholder="Habit ka naam likhein..." autocomplete="off">
+    <button class="add-btn" onclick="addHabit()">+ Habit Add Karen</button>
+  </div>
+
+  <!-- HABIT GRID -->
+  <div class="grid-box">
+    <div id="no-habit" class="no-habit">Abhi koi habit nahi — upar add karein! 🌱</div>
+    <div class="grid-scroll" id="grid-scroll" style="display:none">
+      <table>
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SLEEP TRACKER -->
+  <div class="sec-head">🌙 Sleep Tracker</div>
+  <div class="sleep-box">
+
+    <!-- Log Input Row -->
+    <div class="sleep-log-row">
+      <div class="sleep-log-label">Neend log karen:</div>
+      <div class="sleep-input-group">
+        <select id="sl-day" class="sel-small"></select>
+        <select id="sl-mon" class="sel-mid"></select>
+        <select id="sl-yr" class="sel-yr"></select>
+        <input class="hrs-inp" id="sl-hrs" type="number" placeholder="Hrs" min="0" max="24" step="0.5">
+        <button class="log-btn" onclick="logSleep()">Log</button>
+      </div>
+    </div>
+
+    <!-- ── SLEEP HOURS TABLE (fixed column) ── -->
+    <div class="sleep-table-wrap">
+      <table class="sleep-table" id="sleep-table">
+        <thead id="sleep-table-head"></thead>
+        <tbody id="sleep-table-body"></tbody>
+      </table>
+    </div>
+
+    <!-- BAR CHART -->
+    <div class="chart-section-title">📊 Sleep Chart</div>
+    <div class="chart-wrap">
+      <div class="y-ax">
+        <div class="y-lbl">12h</div>
+        <div class="y-lbl">9h</div>
+        <div class="y-lbl">6h</div>
+        <div class="y-lbl">3h</div>
+        <div class="y-lbl">0h</div>
+      </div>
+      <div class="h-lines">
+        <div class="h-line"></div><div class="h-line"></div>
+        <div class="h-line"></div><div class="h-line"></div>
+        <div class="h-line"></div>
+      </div>
+      <div class="bars-scr"><div class="bars-row" id="sleep-bars"></div></div>
+    </div>
+    <!-- X axis: day number + weekday -->
+    <div class="x-scr"><div class="x-row" id="sleep-x"></div></div>
+
+    <div class="legend">
+      <div class="leg-i"><div class="leg-d" style="background:#f97316"></div>Low(0-4h)</div>
+      <div class="leg-i"><div class="leg-d" style="background:#60a5fa"></div>Normal(4-7h)</div>
+      <div class="leg-i"><div class="leg-d" style="background:#34d399"></div>Good(7-9h)</div>
+      <div class="leg-i"><div class="leg-d" style="background:#a78bfa"></div>Great(9h+)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: NOTES ══ -->
+<div class="screen" id="screen-notes">
+  <div class="notes-top">
+    <div class="notes-heading">📝 My Notes</div>
+    <div class="notes-count" id="notes-count">0 notes</div>
+  </div>
+  <div class="note-add-box">
+    <div class="note-add-title">✏️ TODAY'S NOTE</div>
+    <textarea class="note-textarea" id="note-text" placeholder="Aaj ka note likhein..."></textarea>
+    <div class="img-preview-wrap" id="img-preview-wrap">
+      <img id="img-preview" src="" alt="preview">
+      <div class="remove-img-btn" onclick="removeImg()">✕ Image Hatao</div>
+    </div>
+    <div class="note-actions">
+      <label class="gallery-btn">
+        📷 Gallery
+        <input type="file" id="img-file-input" accept="image/*" onchange="handleImagePick(this)">
+      </label>
+      <button class="save-note-btn" onclick="saveNote()">💾 Save Note</button>
+    </div>
+  </div>
+  <div id="notes-empty" class="notes-empty">Koi note nahi — upar likhein! 📝</div>
+  <div id="notes-list"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-habits" onclick="switchScreen('habits')">
+    <div class="nav-ico">✦</div>
+    <div>Habits</div>
+    <div class="nav-bar"></div>
+  </button>
+  <button class="nav-btn" id="nav-notes" onclick="switchScreen('notes')">
+    <div class="nav-ico">📝</div>
+    <div>Notes</div>
+    <div class="nav-bar"></div>
+  </button>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+  </html>
+  
